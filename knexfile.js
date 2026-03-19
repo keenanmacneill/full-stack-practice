@@ -1,9 +1,8 @@
-require('dotenv').config()
+require('dotenv').config();
 
-const connectionString = process.env.DB_CONNECTION_STRING
+const connectionString = process.env.DB_CONNECTION_STRING;
 
 module.exports = {
-
   development: {
     client: 'pg',
     connection: {
@@ -23,6 +22,5 @@ module.exports = {
   production: {
     client: '',
     connection: {},
-  }
-
+  },
 };
