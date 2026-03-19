@@ -1,4 +1,10 @@
 node_modules/
-requests.http
+
 .env
-.vscode
+.env.*
+
+!.env.example
+
+coverage/
+dist/
+build/
