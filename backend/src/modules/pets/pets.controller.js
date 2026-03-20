@@ -1,108 +1,104 @@
-app.get('/pets', (req, res) => {
-  knex('pet')
-    .join('pet_type', 'pet.pet_type_id', 'pet_type.id')
-    .select('pet.id', 'pet.name', 'pet_type.name as type')
-    .then(pets => {
-      res.json(pets);
-    });
-});
+const petsService = require('./pets.service');
 
-app.get('/pets/sort', (req, res) => {
-  knex('pet')
-    .join('pet_type', 'pet.pet_type_id', 'pet_type.id')
-    .select('pet.id', 'pet.name', 'pet_type.name as type')
-    .orderBy('pet.name')
-    .then(pets => {
-      res.json(pets);
-    });
-});
-
-app.get('/pets/:id', (req, res) => {
-  knex('pet')
-    .join('pet_type', 'pet.pet_type_id', 'pet_type.id')
-    .where('pet.id', req.params.id)
-    .select('pet.id', 'pet.name', 'pet_type.name as type')
-    .first()
-    .then(pet => {
-      res.json(pet);
-    });
-});
-
-app.get('/pets/type/:type', (req, res) => {
-  knex('pet')
-    .join('pet_type', 'pet.pet_type_id', 'pet_type.id')
-    .select('pet.id', 'pet.name', 'pet_type.name as type')
-    .where('pet_type.name', req.params.type)
-    .then(pets => {
-      res.json(pets);
-    });
-});
-
-app.get('/pets/limit/:limit', (req, res) => {
-  knex('pet')
-    .join('pet_type', 'pet.pet_type_id', 'pet_type.id')
-    .select('pet.id', 'pet.name', 'pet_type.name as type')
-    .limit(req.params.limit)
-    .then(pets => {
-      res.json(pets);
-    });
-});
-
-app.post('/pets', async (req, res) => {
+async function getAllPets(req, res) {
   try {
-    if (!req.body.name || !req.body.type) {
-      return res.status(400).json({ error: 'Name and type are required.' });
-    }
-
-    const type = await knex('pet_type').where('name', req.body.type).first();
-
-    if (!type) {
-      return res.status(400).json('Invalid pet type.');
-    }
-
-    const newPet = await knex('pet')
-      .insert({
-        name: req.body.name,
-        pet_type_id: type.id,
-      })
-      .returning('*');
-
-    res.status(201).json(newPet[0]);
+    const pets = await petsService.getAllPets();
+    res.json(pets);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ error: 'Failed to fetch pets.' });
   }
-});
+}
 
-app.patch('/pets/:id', async (req, res) => {
+async function getSortedPets(req, res) {
   try {
-    if (!req.body.name) {
-      return res.status(400).json({ error: 'Name is required.' });
-    }
-
-    const updatedPet = await knex('pet')
-      .where('pet.id', req.params.id)
-      .update({ name: req.body.name })
-      .returning('*');
-
-    res.status(200).json(updatedPet[0]);
+    const pets = await petsService.getSortedPets();
+    res.json(pets);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ error: 'Failed to fetch pets.' });
   }
-});
+}
 
-app.delete('/pets/:id', async (req, res) => {
+async function getPetById(req, res) {
   try {
-    const deletedPet = await knex('pet')
-      .where('id', req.params.id)
-      .del()
-      .returning('*');
+    const pet = await petsService.getPetById(req.params.id);
 
-    if (!deletedPet.length) {
+    if (!pet) {
       return res.status(404).json({ error: 'Pet not found.' });
     }
 
-    res.status(200).json(deletedPet[0]);
+    res.json(pet);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ error: 'Failed to fetch pet.' });
   }
-});
+}
+
+async function getPetsByType(req, res) {
+  try {
+    const pets = await petsService.getPetsByType(req.params.type);
+    res.json(pets);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch pets.' });
+  }
+}
+
+async function getLimitedPets(req, res) {
+  try {
+    const pets = await petsService.getLimitedPets(req.params.limit);
+    res.json(pets);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch pets.' });
+  }
+}
+
+async function createPet(req, res) {
+  try {
+    const newPet = await petsService.createPet(req.body);
+
+    if (newPet.error) {
+      return res.status(newPet.status).json({ error: newPet.error });
+    }
+
+    res.status(201).json(newPet);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create pet.' });
+  }
+}
+
+async function updatePetName(req, res) {
+  try {
+    const updatedPet = await petsService.updatePetName(req.params.id, req.body);
+
+    if (updatedPet.error) {
+      return res.status(updatedPet.status).json({ error: updatedPet.error });
+    }
+
+    res.json(updatedPet);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update pet.' });
+  }
+}
+
+async function deletePet(req, res) {
+  try {
+    const deletedPet = await petsService.deletePet(req.params.id);
+
+    if (deletedPet.error) {
+      return res.status(deletedPet.status).json({ error: deletedPet.error });
+    }
+
+    res.json(deletedPet);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete pet.' });
+  }
+}
+
+module.exports = {
+  getAllPets,
+  getSortedPets,
+  getPetById,
+  getPetsByType,
+  getLimitedPets,
+  createPet,
+  updatePetName,
+  deletePet,
+};
