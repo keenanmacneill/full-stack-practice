@@ -1,4 +1,4 @@
-const { generatePets } = require('../../helpers/generatePets.js');
+const { generatePets } = require('./helpers/generatePets.js');
 
 exports.seed = async function (knex) {
   const pets = generatePets(50);
