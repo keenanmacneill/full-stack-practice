@@ -1,26 +1,20 @@
-require('dotenv').config();
-
-const connectionString = process.env.DB_CONNECTION_STRING;
+require('dotenv/config');
 
 module.exports = {
   development: {
-    client: 'pg',
+    client: 'postgresql',
     connection: {
-      host: '127.0.0.1',
-      password: 'docker',
-      user: 'postgres',
-      port: 5432,
-      database: 'pet_store',
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
     },
-  },
-
-  staging: {
-    client: '',
-    connection: {},
-  },
-
-  production: {
-    client: '',
-    connection: {},
+    migrations: {
+      directory: './db/migrations',
+    },
+    seeds: {
+      directory: './db/seeds',
+    },
   },
 };

@@ -1,13 +1,7 @@
 const { faker } = require('@faker-js/faker');
 
-exports.generatePetTypes = (count = 50) => {
-  const petTypes = [];
-  let i = 0;
+exports.generatePetTypes = (count = 10) => {
+  const types = faker.helpers.uniqueArray(() => faker.animal.type(), count);
 
-  do {
-    petTypes.push({ name: faker.animal.type() });
-    i++;
-  } while (i < 10);
-
-  return petTypes;
+  return types.map(name => ({ name }));
 };
