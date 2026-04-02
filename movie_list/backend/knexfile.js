@@ -6,11 +6,11 @@ module.exports = {
   development: {
     client: 'pg',
     connection: {
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      database: 'movie_list',
-      password: 'docker',
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USER,
+      database: process.env.DB_DATABASE,
+      password: process.env.DB_PASSWORD,
     },
   },
 };

@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "knex migrate:latest && nodemon server.js",
+    "migrate": "knex migrate:latest"
   },
   "keywords": [],
   "author": "",
