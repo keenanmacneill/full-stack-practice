@@ -66,7 +66,9 @@ app.delete('/movies/:id', async (req, res) => {
       ? res.status(404).json({ message: 'Movie does not exist.' })
       : res
           .status(200)
-          .json({ message: `'${deletedMovie}' was successfully deleted.` });
+          .json({
+            message: `'${deletedMovie.title}' was successfully deleted.`,
+          });
   } catch (err) {
     res
       .status(err.status || 500)
